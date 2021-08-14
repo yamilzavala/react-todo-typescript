@@ -1,24 +1,81 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import "./App.css";
 
-function App() {
+type FormElement = React.FormEvent<HTMLFormElement>;
+interface ITodo {
+  name: string;
+  done: boolean;
+}
+const withoutBorderStyle = {
+  border: 'none'
+}
+
+function App(): JSX.Element {
+  const [todo, setTodo] = useState<string>("");
+  const [todosArray, setTodosArray] = useState<ITodo[]>([]);
+
+  const handleSubmit = (e: FormElement) => {
+    e.preventDefault();
+    addTodo(todo);
+    setTodo("");
+    console.log(todosArray);
+  };
+
+  const addTodo = (newTodo: string) => {
+    const newState: ITodo[] = [...todosArray, { name: newTodo, done: false }];
+    setTodosArray(newState);
+  };
+
+  const toggleTodo = (i: number): void => {
+   const newTodoState: ITodo[] = [...todosArray];
+   newTodoState.map((currentTodo: ITodo, idx: number) => {
+     if (i === idx) currentTodo.done = !currentTodo.done; 
+   });
+   setTodosArray(newTodoState)
+  }
+
+  const removeTodo = (i: number): void => {
+    const newTodoState: ITodo[] = [...todosArray];
+    newTodoState.splice(i,1);
+    setTodosArray(newTodoState);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container p-4">
+      <div className="row">
+        <div className="col-md-6 offset-md-3">
+          <div className="card">
+            <div className="card-body">
+              <form onSubmit={handleSubmit}>
+                <input
+                  autoFocus
+                  className="form-control"
+                  value={todo}
+                  placeholder="Enter a todo..."
+                  onChange={(e) => setTodo(e.target.value)}
+                />
+                <button className="btn btn-success btn-block mt-2 withoutBorderStyle" style={{width: '290px', border: 'none'}}>Save</button>
+              </form>
+            </div>
+          </div>
+
+          {todosArray.map((todoItem: ITodo, i: number) => (
+            <div className="card card-body mt-2" key={i}>
+              <h1 style={{textDecoration: todoItem.done ? 'line-through' : ''}}>{todoItem.name} </h1>
+              
+              <button 
+              onClick={() => {toggleTodo(i)}} 
+              style={withoutBorderStyle} 
+              className="btn btn-light btn-block mt-2">{todoItem.done ? 'Complete' : 'Uncomplete'}</button>
+              
+              <button 
+              onClick={() => {removeTodo(i)}} 
+              style={withoutBorderStyle} 
+              className="btn btn-danger btn-block mt-2">Remove</button>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
