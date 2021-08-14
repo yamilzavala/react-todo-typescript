@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./App.css";
 
 type FormElement = React.FormEvent<HTMLFormElement>;
@@ -11,6 +11,7 @@ const withoutBorderStyle = {
 }
 
 function App(): JSX.Element {
+  const inputTodoRef = useRef<HTMLInputElement>(null);
   const [todo, setTodo] = useState<string>("");
   const [todosArray, setTodosArray] = useState<ITodo[]>([]);
 
@@ -24,6 +25,7 @@ function App(): JSX.Element {
   const addTodo = (newTodo: string) => {
     const newState: ITodo[] = [...todosArray, { name: newTodo, done: false }];
     setTodosArray(newState);
+    inputTodoRef.current?.focus();
   };
 
   const toggleTodo = (i: number): void => {
@@ -48,6 +50,7 @@ function App(): JSX.Element {
             <div className="card-body">
               <form onSubmit={handleSubmit}>
                 <input
+                  ref={inputTodoRef}
                   autoFocus
                   className="form-control"
                   value={todo}
@@ -61,8 +64,8 @@ function App(): JSX.Element {
 
           {todosArray.map((todoItem: ITodo, i: number) => (
             <div className="card card-body mt-2" key={i}>
-              <h1 style={{textDecoration: todoItem.done ? 'line-through' : ''}}>{todoItem.name} </h1>
-              
+              <h6 style={{textDecoration: todoItem.done ? 'line-through' : ''}}>{todoItem.name} </h6>
+
               <button 
               onClick={() => {toggleTodo(i)}} 
               style={withoutBorderStyle} 
